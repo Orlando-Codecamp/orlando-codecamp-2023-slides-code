@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Clockwork demo</title>
+
+        <style>
+            html, body {
+                background-color: #000;
+                margin: 0;
+                padding: 0;
+            }
+
+            .clockboard {
+                color: #333;
+                font-family: consolas, 'courier new', courier, monospace;
+                font-size: min(7vw, 9vh);
+                margin: .5em auto;
+                padding: 1em;
+                text-align: center;
+                width: 10em;
+            }
+
+            b {
+                color: #FFF;
+                font-weight: bold;
+            }
+
+            p {
+                margin:0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class=clockboard id=theclock></div>
+        <script src=clockwork.js></script>
+
+        <script>
+            const board = document.getElementById('theclock');
+            let clockwork = GetClockwork('en');
+            let english = true;
+
+            function showWords(words) {
+                board.innerHTML = '';
+
+                words.forEach(showRow);
+            }
+
+            function showRow(row) {
+                const line = document.createElement('p');
+
+                row.forEach((word) => {
+                    showWord(word, line);
+                });
+
+                board.appendChild(line);
+            }
+
+            function showWord(word, line) {
+                let newWord = null;
+
+                if (clockwork.isHighlighted(word)) {
+                    newWord = document.createElement('b');
+                    newWord.innerHTML = clockwork.getText(word) + " ";
+                }
+                else {
+                    newWord = document.createTextNode(clockwork.getText(word) + " ");
+                }
+
+                line.appendChild(newWord)
+            }
+
+            function showTime() {
+                const now = new Date();
+                const timeStr = clockwork.formatTime(new Date());
+                const words = clockwork.timeWords(timeStr);
+                const highlighted = clockwork.highlights(words);
+
+                showWords(highlighted);
+            }
+
+            setInterval(showTime, 1000);
+            showTime();
+
+            board.addEventListener('click', () => {
+                english = !english;
+                clockwork = GetClockwork(english ? 'en' : 'es');
+                showTime();
+            });
+        </script>
+    </body>
+</html>

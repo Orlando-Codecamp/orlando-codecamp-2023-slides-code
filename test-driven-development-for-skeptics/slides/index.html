@@ -1,0 +1,1423 @@
+<html>
+<head><title>Pres notes</title></head>
+<link href="style.css" rel="stylesheet"/>
+<body>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>Test-Driven Development for Skeptics</h2>
+<ul class="contact">
+<li>Paul Roub</li>
+</ul>
+</div>
+</div>
+<div class="slide">
+
+<div class="slidecontent">
+<h2>Yeah, but TDD…</h2>
+<p class="step">… adds needless overhead</p>
+<p class="step">… interrupts my workflow</p>
+<p class="step">… slows me down</p>
+<p class="step">… anyway, I already have regression tests</p>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>Ah, But the Data and the Research!</h2>
+<p>So much data! All the research!</p>
+<p class="step">Just not in <em>this</em> talk.</p>
+</div>
+</div>
+<div class="slide">
+
+<div class="slidecontent">
+<h2>Yeah, but <span class="strike">TDD</span> <span class="addition">buggy, untested code</span>…</h2>
+<p>… adds needless overhead</p>
+<p>… interrupts my workflow</p>
+<p>… slows me down</p>
+<p>… <span class="strike">anyway, I already have</span> <span class="addition">forces me to write </span> regression tests
+        <span class="step addition"> for code I don't necessarily remember writing</span>
+<span class="step addition">(or didn't write in the first place)</span></p>
+</div>
+</div>
+<!--     Initial repo with jest installed -->
+<div class="slide" data-sha="ceae8469500a891c65d3448b0d8edffebe997cb8">
+
+<div class="slidecontent">
+<h2>So much overhead</h2>
+<pre class="step"><code class="sh">
+npm install --save-dev jest
+        </code></pre>
+<p class="step">It's at least that easy in your development environment of choice.</p>
+<p class="step">There's a TDD framework for COBOL.</p>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>What is a Unit Test?</h2>
+<blockquote>
+            A unit test is an automated piece of code that invokes a unit of work in the system and then checks a single
+            assumption about the behavior of that unit of work.
+        </blockquote>
+<cite>(Roy Osherove)</cite>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>The TDD Cycle</h2>
+<ol>
+<li class="step">Write a test that exposes the next piece of missing or incorrect functionality.</li>
+<li class="step">Write the simplest production code that makes this test pass.</li>
+<li class="step">Confirm all tests pass</li>
+<li class="step">Refactor until you <em>like</em> the code (Osherove again)</li>
+</ol>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<div class="slide" data-sha="9db455af52240eb3953c8c70a75eff025772f23f">
+
+<div class="slidecontent">
+<h2>A "simple" first test</h2>
+<pre><code class="lang-js">
+
+test('high noon', () =&gt; {
+    const time = '12:00:00';
+    const expected = [
+        [
+            "*it*", "*is*", "half", "ten"
+        ],
+        [
+            "quarter", "twenty"
+        ],
+        [
+            "five", "minutes", "to"
+        ],
+        [
+            "past", "one", "three"
+        ],
+        [
+            "two", "four", "five"
+        ],
+        [
+            "six", "seven", "eight"
+        ],
+        [
+            "nine", "ten", "eleven"
+        ],
+        [
+            "*twelve*", "*o'clock*"
+        ]
+    ];
+
+    expect(
+        clockwork.highlightTime(time))
+        .toStrictEqual(expected);
+});</code></pre>
+</div>
+</div>
+<!-- 02a85d28c295bec5edf71931cc857c2928ebf694
+    Simplest, dumbest passage of our noon test
+    -->
+<div class="slide" data-sha="02a85d28c295bec5edf71931cc857c2928ebf694">
+
+<div class="slidecontent">
+<h2>Make the test pass as simply as possible</h2>
+<p class="step">No, really.</p>
+<pre class="step"><code class="lang-js">
+highlightTime() {
+    return [
+        [
+            "*it*", "*is*", "half", "ten"
+        ],
+        [
+            "quarter", "twenty"
+        ],
+        [
+            "five", "minutes", "to"
+        ],
+        [
+            "past", "one", "three"
+        ],
+        [
+            "two", "four", "five"
+        ],
+        [
+            "six", "seven", "eight"
+        ],
+        [
+            "nine", "ten", "eleven"
+        ],
+        [
+            "*twelve*", "*o'clock*"
+        ]
+    ];
+}
+        </code></pre>
+</div>
+</div>
+<div class="slide">
+
+<div class="slidecontent">
+<h2>Was that a waste of time? No.</h2>
+<ul>
+<li class="step">Worry about one thing at a time.</li>
+<li class="step">Current concern: make sure our interface is what we think it is.</li>
+<li class="step">And make sure we <em>like</em> that interface.</li>
+<li class="step">Speaking of which...</li>
+</ul>
+</div>
+</div>
+<!-- 9164cb0370b16a2df0a4f27eac9a8ffa579fee9e
+    Let's just test time-to-words now, not the display
+    -->
+<div class="slide" data-sha="9164cb0370b16a2df0a4f27eac9a8ffa579fee9e">
+
+<div class="slidecontent">
+<h2>I don't like this interface.</h2>
+<p>I certainly don't like testing it.</p>
+<p>Writing tests means more calls, sooner, to the method in question.</p>
+<p>"Annoying to test" usually goes hand-in-hand with "annoying to use"</p>
+<p>
+            With TDD, little annoyances become noticeable right away - this technical debt had
+            a lifespan of <em>minutes</em>.</p>
+</div>
+</div>
+<div class="slide" data-sha="9164cb0370b16a2df0a4f27eac9a8ffa579fee9e">
+
+<div class="slidecontent">
+<h2>One thing at a time</h2>
+<p>Only test the time-to-words conversion for now, don't worry about the display.</p>
+<pre><code class="lang-js">
+const time = '12:00:00';
+const expected = [
+    "it", "is", "twelve", "o'clock"
+];
+
+expect(clockwork.timeWords(time))
+    .toStrictEqual(expected);
+        </code></pre>
+</div>
+</div>
+<div class="slide" data-sha="9164cb0370b16a2df0a4f27eac9a8ffa579fee9e">
+
+<div class="slidecontent">
+<h2>One thing at a time (continued)</h2>
+<pre><code class="lang-js">
+module.exports = {
+    timeWords() {
+        return [
+            "it", "is", "twelve", "o'clock"
+        ];
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- d1458bb26488db4a3ba8d7bf89ec2c66dd7ba53a
+    Don't expect seconds in our input
+    -->
+<div class="slide" data-sha="d1458bb26488db4a3ba8d7bf89ec2c66dd7ba53a">
+
+<div class="slidecontent">
+<h2>One more interface adjustment</h2>
+<pre><code class="lang-diff">
+--- a/trivial.test.js
++++ b/trivial.test.js
+@@ -1,7 +1,7 @@
+ test('high noon', () =&gt; {
+-    const time = '12:00:00';
++    const time = '12:00';
+        </code></pre>
+</div>
+</div>
+<!-- 0894ba01ba604e918bd6e6f9df16562c52cc2786
+    Failing test for 10:00
+    -->
+<!-- 211bd98b71777b761277c6a30c212bad0918fef6
+    Fix typo in expectations
+    -->
+<!-- 86ce4332f200803909ac4deeb60bcc037423e120
+    Fix typo in code
+    -->
+<div class="slide" data-sha="86ce4332f200803909ac4deeb60bcc037423e120">
+
+<div class="slidecontent">
+<h2>Let's get slightly less dumb</h2>
+<pre><code class="lang-js">
+test('another hour', () =&gt; {
+    const time = '10:00';
+    const expected = [
+        "it", "is", "ten", "o'clock"
+    ];
+
+    expect(clockwork.timeWords(time))
+        .toStrictEqual(expected);
+});
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- a3eab0131d8c3be6961e75302a3548fac2486bea
+    Retrieve hour from the input time
+    -->
+<div class="slide" data-sha="a3eab0131d8c3be6961e75302a3548fac2486bea">
+
+<div class="slidecontent">
+<h2>Fix the new test, don't break anything  </h2>
+<pre><code class="lang-js">
+const hours = [
+    "twelve", "one", "two", "three",
+    "four", "five", "six", "seven",
+    "eight", "nine", "ten", "eleven"
+];
+
+module.exports = {
+    timeWords(timestring) {
+        const parts = timestring.split(':');
+        const hour = Number(parts[0]);
+        const hourStr = hours[hour % 12];
+
+        return [
+            "it", "is", hourStr, "o'clock"
+        ];
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- 4a375cad6a8ccd27563e39457772959c72908050
+    Refactor time parsing into its own function
+    -->
+<!-- fed06673e51ff8d86291c36242a918524c33db3c
+    No longer a trivial test
+    -->
+<div class="slide" data-sha="fed06673e51ff8d86291c36242a918524c33db3c">
+
+<div class="slidecontent">
+<h2>On green days, we refactor</h2>
+<pre><code class="lang-js">
+function timeWords(timestring) {
+    const parts = parseTime(timestring);
+    const hour = parts[0];
+
+    const hourStr = hours[hour % 12];
+
+    return [
+        "it", "is", hourStr, "o'clock"
+    ];
+}
+
+function parseTime(timestr) {
+    return timestr
+        .split(':')
+        .map(numstr =&gt; Number(numstr));
+}
+
+module.exports = {
+    timeWords
+}
+        </code></pre>
+</div>
+</div>
+<!-- 8ac6a0844a9ec5bfe2e58b9065ad630f3c0f8530
+    Coverage tests, confirming we handle AM/PM/noon/midnight
+    -->
+<div class="slide" data-sha="8ac6a0844a9ec5bfe2e58b9065ad630f3c0f8530">
+
+<div class="slidecontent">
+<h2>Confirm some assumptions</h2>
+<pre><code class="lang-js">
+test('midnight', () =&gt; {
+    const time = '00:00';
+    const expected = [
+        "it", "is", "twelve", "o'clock"
+    ];
+//...
+test('handle PM times', () =&gt; {
+    const time = '22:00';
+    const expected = [
+        "it", "is", "ten", "o'clock"
+    ];
+        </code></pre>
+</div>
+</div>
+<!-- e7d4dda74b89eb52aa7841cc3d2b87992e96cdc4
+    Failing test for 5 past 12
+    -->
+<div class="slide" data-sha="e7d4dda74b89eb52aa7841cc3d2b87992e96cdc4">
+
+<div class="slidecontent">
+<h2>Let's Fail Some More!</h2>
+<pre><code class="lang-js">
+const time = '12:05';
+const expected = [
+    "it", "is", "five", "minutes", "past", "twelve"
+];
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- 0124f35179cf97a92b2e83a4b5ed982a8ed97359
+    Include minutes, skip o'clock, if non-zero
+    -->
+<div class="slide" data-sha="0124f35179cf97a92b2e83a4b5ed982a8ed97359">
+
+<div class="slidecontent">
+<h2>Handle minutes, with minimal changes</h2>
+<pre><code class="lang-diff">
+-    return [
+-        "it", "is", hourStr, "o'clock"
+-    ];
++    if (minute == 0)
++    {
++        return [
++            "it", "is", hourStr, "o'clock"
++        ];
++    }
++    else {
++        const minuteStr = numberWords[minute];
++
++        return [
++            "it", "is", minuteStr, "minutes", "past", hourStr
++        ];
++    }
+             </code></pre>
+</div>
+</div>
+<!-- 9de643f25debee46e5afe5ccac294a4ce771895b
+    Slight refactor
+    -->
+<!-- 8498513cd8adee42d2ebaf547f568618b86e3ea7
+    Failing test for 20 past
+    -->
+<div class="slide" data-sha="8498513cd8adee42d2ebaf547f568618b86e3ea7">
+
+<div class="slidecontent">
+<h2>But is this a general fix?</h2>
+<pre class="step"><code class="lang-js">
+test('twenty past the hour', () =&gt; {
+    const time = '12:20';
+    const expected = [
+        "it", "is", "twenty", "minutes", "past", "twelve"
+    ];
+        </code></pre>
+<img alt="Failing test, expected 'twelve' saw 'undefined'" class="step" src="images/f.png"/>
+</div>
+</div>
+<!-- 64a8a87276e0ff469231e1fe4aefe23e16853e2b
+    Add a special case for 20 minutes past
+    -->
+<div class="slide" data-sha="64a8a87276e0ff469231e1fe4aefe23e16853e2b">
+
+<div class="slidecontent">
+<h2>Fix that, quick 'n dirty.</h2>
+<pre><code class="lang-js">
+function numberWords(num) {
+    const words = [
+        "twelve", "one", "two", "three",
+        "four", "five", "six", "seven",
+        "eight", "nine", "ten", "eleven"
+    ];
+
+    if (num == 20) {
+        return "twenty";
+    }
+
+    return words[num];
+}
+        </code></pre>
+</div>
+</div>
+<!-- ba80209fa3cb0711de836a881bf4ed15116093b3
+    Failing test - round minutes down
+    -->
+<div class="slide" data-sha="ba80209fa3cb0711de836a881bf4ed15116093b3">
+
+<div class="slidecontent">
+<h2>We should only think in fives</h2>
+<pre class="step"><code class="lang-js">
+    const time = '12:06';
+    const expected = [
+        "it", "is", "five", "minutes", "past", "twelve"
+    ];
+        </code></pre>
+<p class="fail step">FAIL</p>
+</div>
+</div>
+<!-- bb671112426e43bcd81d2e9173d3b7a0d5e99965
+    Round minutes down to the nearest 5
+    -->
+<div class="slide" data-sha="bb671112426e43bcd81d2e9173d3b7a0d5e99965">
+
+<div class="slidecontent">
+<h2>Can we fix it?</h2>
+<pre class="step"><code class="lang-js">
+const minute = roundMinutes(parts[1]);
+// ...
+function roundMinutes(minutes) {
+    return minutes - minutes % 5;
+}
+        </code></pre>
+<p class="success step">Yes we can!</p>
+</div>
+</div>
+<!-- 28501677603706ff13ffedcaf728751012b6c494
+    Failing test for quarter past
+    -->
+<div class="slide" data-sha="28501677603706ff13ffedcaf728751012b6c494">
+
+<div class="slidecontent">
+<h2>What about quarter past?</h2>
+<pre><code class="lang-js">
+test('quarter past the hour', () =&gt; {
+    const time = '12:15';
+    const expected = [
+        "it", "is", "quarter", "past", "twelve"
+    ];
+
+    expect(clockwork.timeWords(time)).toStrictEqual(expected);
+});
+        </code></pre>
+<p class="step">Umm, actually, "quarter" is not even a number.</p>
+</div>
+</div>
+<!-- 96d028163ffeeb0137c6e2dd45899d987b0a5988
+    Not-quite-a-fix for quarter past
+    -->
+<!-- 1f115dcd9cbe4ee7cf9959a5effeb4231648cd4a
+    Fix the quarter-past issue
+    -->
+<div class="slide" data-sha="1f115dcd9cbe4ee7cf9959a5effeb4231648cd4a">
+
+<div class="slidecontent">
+<h2>More corners! More cases!</h2>
+<pre><code class="lang-js">
+function minuteWords(minutes) {
+    if (minutes == "20") {
+        return ["twenty", "minutes"];
+    }
+    else if (minutes == 15) {
+        return ["quarter"];
+    }
+    else {
+        return [numberWords(minutes), "minutes"];
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- 67fadaf273947265f235ce3cb78fa9ce5a61be20
+    Failing test for half-past-twelve
+    -->
+<div class="slide" data-sha="67fadaf273947265f235ce3cb78fa9ce5a61be20">
+
+<div class="slidecontent">
+<h2>Half-past?</h2>
+<pre><code class="lang-js">
+const time = '12:30';
+const expected = [
+    "it", "is", "half", "past", "twelve"
+];
+        </code></pre>
+<p class="fail">FAIL</p>
+</div>
+</div>
+<!-- 02743124db8a315dfa96dc956756436f5b3c6e72
+    Handle half-past
+    -->
+<div class="slide" data-sha="02743124db8a315dfa96dc956756436f5b3c6e72">
+
+<div class="slidecontent">
+<h2>More like ALL PASSED</h2>
+<pre><code class="lang-diff">
+     else if (minutes == 15) {
+         return ["quarter"];
+     }
++    else if (minutes == 30) {
++        return ["half"];
++    }
+     else {
+         return [numberWords(minutes), "minutes"];
+     }
+             </code></pre>
+</div>
+</div>
+<!-- a08c7db8c7e4f9afa134c64a5ae838681cc27f76
+    Failing test - twenty-five past
+    -->
+<div class="slide" data-sha="a08c7db8c7e4f9afa134c64a5ae838681cc27f76">
+
+<div class="slidecontent">
+<h2>25 past</h2>
+<pre><code class="lang-js">
+test('twenty-five past the hour', () =&gt; {
+    const time = '12:25';
+    const expected = [
+        "it", "is", "twenty", "five", "minutes", "past", "twelve"
+    ];
+
+    expect(clockwork.timeWords(time)).toStrictEqual(expected);
+});
+        </code></pre>
+<p class="fail">FAIL</p>
+</div>
+</div>
+<!-- 35c0d1cdd1aca4cb8ab4b570c0c3870eeab7d3df
+    Handle twenty-five past
+    -->
+<div class="slide" data-sha="35c0d1cdd1aca4cb8ab4b570c0c3870eeab7d3df">
+
+<div class="slidecontent">
+<h2>Surprise!</h2>
+<pre><code class="lang-diff">
+     else if (minutes == 15) {
+         return ["quarter"];
+     }
++    else if (minutes == 25) {
++        return ["twenty", "five", "minutes"];
++    }
+     else if (minutes == 30) {
+         return ["half"];
+     }
+        </code></pre>
+</div>
+</div>
+<!-- 60191ebddc0f4bb2ed97aa2e838ca2bc3b8f4d46
+    Failing test for 5 before the hour
+    -->
+<div class="slide" data-sha="60191ebddc0f4bb2ed97aa2e838ca2bc3b8f4d46">
+
+<div class="slidecontent">
+<h2>Sometimes things happen BEFORE the hour</h2>
+<pre><code class="lang-js">
+test('five to one', () =&gt; {
+    const time = '12:55';
+    const expected = [
+        "it", "is", "five", "minutes", "to", "one"
+    ];
+
+    expect(clockwork.timeWords(time)).toStrictEqual(expected);
+})
+        </code></pre>
+<p class="fail">FAIL</p>
+</div>
+</div>
+<!-- acca85de649056a096707d23a7f5f7b74b33e1b1
+    Quick fix for 5 'til
+    -->
+<!-- 523da340559ec0f6fd6d5d2e46ebc40bbbc7f858
+    Add a coverage test for quarter-to
+    -->
+<div class="slide" data-sha="523da340559ec0f6fd6d5d2e46ebc40bbbc7f858">
+
+<div class="slidecontent">
+<h2>Handled</h2>
+<pre><code class="lang-js">
+function timeWords(timestring) {
+    const parts = parseTime(timestring);
+    let hour = parts[0] % 12;
+    let minute = roundMinutes(parts[1]);
+
+    if (minute == 0)
+    {
+        return [
+            "it", "is", numberWords(hour), "o'clock"
+        ];
+    }
+    else if (minute &gt; 30) {
+        ++hour;
+        minute = 60 - minute;
+
+        const minuteStr = minuteWords(minute);
+
+        return ["it", "is"]
+            .concat(minuteStr)
+            .concat(["to", numberWords(hour)]);
+    }
+    else {
+        const minuteStr = minuteWords(minute);
+
+        return ["it", "is"]
+            .concat(minuteStr)
+            .concat(["past", numberWords(hour)]);
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- 854eb7e530540928eee0b623bb41e09bde272caf
+    Refactor past/to logic
+    -->
+<div class="slide" data-sha="854eb7e530540928eee0b623bb41e09bde272caf">
+
+<div class="slidecontent">
+<h2>Let's tidy up a bit</h2>
+<pre><code class="lang-js">
+function timeWords(timestring) {
+    const parts = parseTime(timestring);
+    let hour = parts[0] % 12;
+    let minute = roundMinutes(parts[1]);
+
+    if (minute == 0)
+    {
+        return [
+            "it", "is", numberWords(hour), "o'clock"
+        ];
+    }
+    else {
+        let direction = "past";
+
+        if (minute &gt; 30) {
+            direction = "to";
+            ++hour;
+            minute = 60 - minute;
+        }
+
+        return ["it", "is"]
+            .concat(minuteWords(minute))
+            .concat([direction, numberWords(hour)]);
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- e956fd9b27e3a7ddb7a5055575c5e17bf5f2fddc
+    Add failing 'highlights' test for noon
+    -->
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>That's nice, but...</h2>
+<p class="step">Remember this?</p>
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<div class="slide" data-sha="e956fd9b27e3a7ddb7a5055575c5e17bf5f2fddc">
+
+<div class="slidecontent">
+<h2>We want stars</h2>
+<pre><code class="lang-js">
+test('highlight in order', () =&gt; {
+    const timewords = ["it", "is", "twelve", "o'clock"];
+    const expected = [
+        ["*it", "*is", "half", "ten"],
+        ["quarter", "twenty"],
+        ["five", "minutes", "to"],
+        ["past", "one", "three"],
+        ["two", "four", "five"],
+        ["six", "seven", "eight"],
+        ["nine", "ten", "eleven"],
+        ["*twelve", "*o'clock"]
+    ];
+
+    expect(highlights(timewords)).toStrictEqual(expected);
+});
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- 310503683023eef3a1688534b96473aa2a4f99a1
+    Mark 'chosen' words with '*' to denote highlighting
+    -->
+<div class="slide" data-sha="310503683023eef3a1688534b96473aa2a4f99a1">
+
+<div class="slidecontent">
+<h2>All good on stars, thx.</h2>
+<pre><code class="lang-js">
+const theBoard = [
+    ["it", "is", "half", "ten"],
+    ["quarter", "twenty"],
+    ["five", "minutes", "to"],
+    ["past", "one", "three"],
+    ["two", "four", "five"],
+    ["six", "seven", "eight"],
+    ["nine", "ten", "eleven"],
+    ["twelve", "o'clock"]
+];
+
+function highlights(timeWords) {
+    const result = [];
+    const remaining = timeWords.slice(0);
+    let nextWord = remaining.shift();
+
+    theBoard.forEach((row) =&gt; {
+        const newRow = [];
+
+        row.forEach((word) =&gt; {
+            if (word === nextWord) {
+                newRow.push(`*${word}`);
+                nextWord = remaining.shift();
+            }
+            else {
+                newRow.push(word);
+            }
+        });
+
+        result.push(newRow);
+    });
+
+    return result;
+}
+        </code></pre>
+</div>
+</div>
+<!-- 86880d3d31ce2ba2a928736b1b341f91183b9cd3
+    Add coverage test for a potential oddball case
+    -->
+<!-- 6be436737da2035eec54ed6b82625d64a92b61d1
+    Add eslint, take its advice
+    -->
+<!-- 9bef533b1e6c1839059827555c229bb395653ef2
+    Add a shell demo HTML page
+    -->
+<!-- f0774548ae1de34613d5a63b2463b393a5ee5f6c
+    Don't try to export in the browser
+    -->
+<!-- 43c57937c4d0a4dcb2ab4da1d76e9dfd748c6fdd
+    Expect some helper functions to interpret the text
+    -->
+<div class="slide" data-sha="43c57937c4d0a4dcb2ab4da1d76e9dfd748c6fdd">
+
+<div class="slidecontent">
+<h2>Real talk. How do we use this?</h2>
+<p>Some simple client code:</p>
+<ul>
+<li class="step">Periodically gets the time</li>
+<li class="step">Converts to a string</li>
+<li class="step">Calls `timewords()` and `highlights()` to get the display text</li>
+<li class="step">Uses `isHighlighted()` and `getText()` to decide <em>how</em> to display those.</li>
+<li class="step">^ we just made those up</li>
+</ul>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>Client code</h2>
+<pre><code class="lang-js">
+setInterval(() =&gt; {
+    const now = new Date();
+    const timeStr = `${pad(now.getHours)}:${pad(now.getMinutes())}`;
+    const words = timeWords(timeStr);
+    const highlighted = highlights(words);
+
+    showWords(highlighted);
+}, 100);
+
+function showWord(word, line) {
+    let newWord = null;
+
+    if (isHighlighted(word)) {
+        newWord = document.createElement('b');
+        newWord.innerHTML = getText(word);
+    }
+    else {
+        newWord = document.createTextNode(getText(word));
+    }
+
+    line.appendChild(newWord)
+}        </code></pre>
+</div>
+</div>
+<!-- a505c13f1d163465fa0ecd49eedf91bcc655dc2e
+    Failing test for isHighlighted
+    -->
+<div class="slide" data-sha="a505c13f1d163465fa0ecd49eedf91bcc655dc2e">
+
+<div class="slidecontent">
+<h2>How should isHighlighted work?</h2>
+<p>Well, when something <em>is</em> highlighted...</p>
+<pre><code class="lang-js">
+test('is highlighted', () =&gt; {
+    expect(isHighlighted('*foo')).toBe(true);
+});
+        </code></pre>
+<p class="fail step">FAIL</p>
+</div>
+</div>
+<!-- f58531fabad0de6b816ce9d76986002390b592d1
+    Simplest pass for isHighlighted
+    -->
+<div class="slide" data-sha="f58531fabad0de6b816ce9d76986002390b592d1">
+
+<div class="slidecontent">
+<h2>We get to be dumb again</h2>
+<pre><code class="lang-js">
+function isHighlighted() {
+    return true;
+}
+         </code></pre>
+</div>
+</div>
+<!-- 027b496604347bc63b1e58e1eb127f8919fa641a
+    Failing 'not highlighted' test
+    -->
+<div class="slide" data-sha="027b496604347bc63b1e58e1eb127f8919fa641a">
+
+<div class="slidecontent">
+<h2>Until we don't</h2>
+<pre><code class="lang-js">
+test('is not highlighted', () =&gt; {
+    expect(isHighlighted('foo')).toBe(false);
+});
+        </code></pre>
+<p class="fail step">FAIL</p>
+</div>
+</div>
+<!-- 458b787b4a33c44d1672d73929ca81d6b2107d14
+    Correct isHighlighted
+    -->
+<!-- f4f6e5d85ffb1977de35d766bb1092a0753e30e2
+    Slight test refactor
+    -->
+<div class="slide" data-sha="f4f6e5d85ffb1977de35d766bb1092a0753e30e2">
+
+<div class="slidecontent">
+<h2>Easy enough</h2>
+<pre><code class="lang-js">
+function isHighlighted(word) {
+    return word.slice(0, 1) === '*';
+}
+         </code></pre>
+</div>
+</div>
+<!-- 2c9919c53042ce78615305ac65b27a7dcec88bf4
+    Failing get-text test
+    -->
+<!-- d841ab1998fd11e70db8e1f431b4e628fcc75471
+    Simplest pass for get (non-highlighted) text
+    -->
+<div class="slide" data-sha="d841ab1998fd11e70db8e1f431b4e628fcc75471">
+
+<div class="slidecontent">
+<h2>getText() is trivial...</h2>
+<p>(for non-highlighted text)</p>
+<pre><code class="lang-js">
+test('get non-highlighted text', () =&gt; {
+    expect(getText('foo')).toEqual('foo');
+});
+        </code></pre>
+<pre><code class="lang-js">
+function getText(word) {
+    return word;
+}
+       </code></pre>
+</div>
+</div>
+<!-- 22abda0acf1f997208b2340c659e92b965c67c8a
+    Failing get-highlighted-text test
+    -->
+<div class="slide" data-sha="22abda0acf1f997208b2340c659e92b965c67c8a">
+
+<div class="slidecontent">
+<h2>Only slightly more difficult...</h2>
+<pre><code class="lang-js">
+test('get highlighted text', () =&gt; {
+    expect(getText('*foo')).toEqual('foo');
+});
+        </code></pre>
+<p class="fail step">FAIL</p>
+</div>
+</div>
+<!-- 2ccbc55707629d721ef77e539ffc4fb8459f681e
+    Correct getText for highlighted words
+    -->
+<div class="slide" data-sha="2ccbc55707629d721ef77e539ffc4fb8459f681e">
+
+<div class="slidecontent">
+<h2>...to work in either case</h2>
+<pre><code class="lang-js">
+function getText(word) {
+    if (isHighlighted(word)) {
+        return word.slice(1);
+    }
+    else {
+        return word;
+    }
+}
+        </code></pre>
+</div>
+</div>
+<!-- a099426ccedf1d99d2b81a474421b0f5673a0f27
+    Working demo
+    -->
+<div class="slide" data-sha="a099426ccedf1d99d2b81a474421b0f5673a0f27">
+
+<div class="slidecontent">
+<h2>Up and running!</h2>
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<!-- cf4d4938fa65ed632d5609209b174a3de9bb9b29
+    Add skeleton, usage, and test of formatTime()
+    -->
+<div class="slide" data-sha="cf4d4938fa65ed632d5609209b174a3de9bb9b29">
+
+<div class="slidecontent">
+<h2>Don't make the client think</h2>
+<p>We add a formatTime() function, and don't make the client code do the work</p>
+<pre><code class="lang-js">
+test('format noon', () =&gt; {
+    const noon = new Date();
+    noon.setHours(12);
+    noon.setMinutes(0);
+
+    expect(formatTime(noon)).toEqual('12:00');
+});
+        </code></pre>
+<pre><code class="lang-js">
+function formatTime(dateTime) {
+    return `${pad(dateTime.getHours())}:${pad(dateTime.getMinutes())}`;
+}
+
+function pad(num) {
+    return `0${num}`.slice(-2);
+}
+        </code></pre>
+</div>
+</div>
+<!-- cf4d4938fa65ed632d5609209b174a3de9bb9b29
+    Pass the formatTime() test
+    -->
+<!-- 824829309ed84667326fc8878911a026b5d88221
+    Fit the screen
+    -->
+<div class="slide" data-sha="824829309ed84667326fc8878911a026b5d88221">
+
+<div class="slidecontent">
+<h2>Yeah, but...</h2>
+<p class="step">None of this helps me make <em>broad</em> changes.</p>
+<img alt="You could not be more wrong. You could try, but you would not be successful." class="step" src="images/russ.gif"/>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>¡tengo una idea!</h2>
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<!-- 5d695b61e123d1757576cf8fb6ed38cb37c8eb58
+    Move to a factory model for per-language 'clockworks'
+    -->
+<div class="slide" data-sha="5d695b61e123d1757576cf8fb6ed38cb37c8eb58">
+
+<div class="slidecontent">
+<h2>Let's build a factory</h2>
+<pre><code class="lang-diff">
++const testClock = GetClockwork('en');
+
+//...
+
+-    expect(highlights(timewords))
+-       .toStrictEqual(expected);
++    expect(testClock.highlights(timewords))
++       .toStrictEqual(expected);
+        </code></pre>
+</div>
+</div>
+<div class="slide" data-sha="5d695b61e123d1757576cf8fb6ed38cb37c8eb58">
+
+<div class="slidecontent">
+<h2>Let's build a factory</h2>
+<pre><code class="lang-diff">
+     module.exports = {
+-        timeWords,
+-        highlights,
+-        isHighlighted,
+-        getText,
+-        formatTime
++        GetClockwork(language) {
++            return {
++                timeWords,
++                highlights,
++                isHighlighted,
++                getText,
++                formatTime
++            };
++        }
+     };
+         </code></pre>
+</div>
+</div>
+<!-- 36e6d2b8717da5cd84f3678aa0424808d1419809
+    Add failing test for noon in Spanish
+    -->
+<div class="slide" data-sha="36e6d2b8717da5cd84f3678aa0424808d1419809">
+
+<div class="slidecontent">
+<h2>Time to fail</h2>
+<pre><code class="lang-js">
+const testClock = GetClockwork('es'); // Spanish
+
+test('noon', () =&gt; {
+    const time = '12:00';
+    const expected = [
+        "son", "las", "doce"
+    ];
+
+    expect(testClock.timeWords(time)).toStrictEqual(expected);
+});
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- e85659d1d3c8f77a6d8f5e296a0a4818790d6cef
+    Pass along language-specific details
+    -->
+<!-- de4ecf3aaaaa7d1eb0cf64040d2d3b8e6eb4ba9e
+    Pass the spanish-noon test
+    -->
+<div class="slide" data-sha="de4ecf3aaaaa7d1eb0cf64040d2d3b8e6eb4ba9e">
+
+<div class="slidecontent">
+<h2>Be moderately brave</h2>
+<pre><code class="lang-diff">
+-function timeWords(timestring, numberText) {
++function timeWords(timestring, numberText, prefix, suffix) {
+     const parts = parseTime(timestring);
+     let hour = parts[0] % 12;
+     let minute = roundMinutes(parts[1]);
+
+     if (minute === 0) {
+-        return [
+-            "it", "is", numberWords(hour, numberText), "o'clock"
+-        ];
++        const results = prefix
++            .concat(numberWords(hour, numberText));
++
++        if (suffix) {
++            return results.concat(suffix);
++        }
++        else {
++            return results;
++        }
+     }
+     else {
+         let direction = "past";
+@@ -138,9 +142,43 @@ function GetClockwork(language) {
+             "eleven"
+     ];
+
++    let prefix = ["it", "is"];
++    let suffix = ["o'clock"];
++
++    if (language === "es") {
++        numberText = [
++            "doce",
++            "uno",
++            "dos",
++            "tres",
++            "cuatro",
++            "cinco",
++            "seis",
++            "siete",
++            "ocho",
++            "nueve",
++            "diez",
++            "once"
++        ];
++
++        theBoard = [
++            ["es", "son", "la", "las", "uno"],
++            ["dos", "tres", "cuatro"],
++            ["cinco", "seis", "siete"],
++            ["ocho", "nueve", "diez"],
++            ["once", "doce", "y", "menos"],
++            ["cuarto", "media"],
++            ["cinco", "diez", "veinte"],
++            ["veinticinco"]
++        ];
++
++        prefix = ["son", "las"];
++        suffix = null;
++    }
++
+     return {
+         timeWords: (timestr) =&gt; {
+-            return timeWords(timestr, numberText);
++            return timeWords(timestr, numberText, prefix, suffix);
+         },
+        </code></pre>
+</div>
+</div>
+<!-- eb57c72f183396f5b0e3e7a7ade98292c7b8f5bc
+    Sheepish typo fix
+    -->
+<!-- 695b19c953218914b27ffdc864b1404d45db9d6f
+    Failing test for 'es la una'
+    -->
+<div class="slide" data-sha="695b19c953218914b27ffdc864b1404d45db9d6f">
+
+<div class="slidecontent">
+<h2>Quantities of time</h2>
+<p>Spanish has singular/plural time distinctions that English does not.</p>
+<p>Son las doce, but <em>es la</em> una. (roughly "they are twelve", "it is one"). We don't know how to do that yet.</p>
+<pre><code class="lang-js">
+test('one is prefixed with "la"', () =&gt; {
+    const time = '1:00';
+    const expected = [
+        "es", "la", "una"
+    ];
+    expect(testClock.timeWords(time))
+        .toStrictEqual(expected);
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- ec35957021dd7884e0ddcde581f9cc73254beb8b
+    Pass in plural/singular-specific prefixes (not yet used)
+    -->
+<!-- 09a45bb084171cd50292b00bd9248852a5f838da
+    Using plural prefix to restore previously-passing test
+    -->
+<!-- 7dc7f715c9277b01f48dd1339f0b7d2666c8a9f1
+    Fixed the prefix on una/uno
+    -->
+<!-- 55009fb269a2660fef80ee93336d42105d8c0911
+    Typo fix: uno for una
+    -->
+<div class="slide" data-sha="55009fb269a2660fef80ee93336d42105d8c0911">
+
+<div class="slidecontent">
+<h2>Now we do.</h2>
+<pre><code class="lang-js">
+let prefixes = [
+    ["it", "is"]
+];
+
+if (language === "es") {
+    prefixes = [
+        ["es", "la"],
+        ["son", "las"]
+    ];
+}
+
+// ...
+
+function timeWords(timestring, numberText, prefixes, suffix) {
+    // ...
+    const singular = 0;
+    const plural = prefixes.length === 1 ? 0 : 1;
+    const usedPrefix = hour == 1 ? singular : plural;
+        </code></pre>
+</div>
+</div>
+<!-- a743130dac92b6937c70331a976e0270a1ba8c4a
+    Get our demo page working again
+    -->
+<!-- 030acbd90778f1e420f159ef9339063ce2abb239
+    Failing test for minutes
+    -->
+<div class="slide" data-sha="030acbd90778f1e420f159ef9339063ce2abb239">
+
+<div class="slidecontent">
+<h2>Minutes come in different orders</h2>
+<pre><code class="lang-js">
+test('1:10 es la una y diez', () =&gt; {
+    const time = '1:10';
+    const expected = [
+        "es", "la", "una", "y", "diez"
+    ];
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- 0cef1178c43b3d576b0192f13074ebc436f92c14
+    Refactor into English/Spanish clockwork classes
+    -->
+<!-- edccb6e6de4a3cc83c31528b08b78749b44de911
+    Pass the 1:10 spanish test
+    -->
+<div class="slide" data-sha="edccb6e6de4a3cc83c31528b08b78749b44de911">
+
+<div class="slidecontent">
+<h2>Fix the minutes-after case</h2>
+<pre><code class="lang-diff">
+-   let direction = "past";
++   let direction = "y";
+
+    if (minute &gt; 30) {
+-       direction = "to";
++       direction = "menos";
+        ++hour;
+        minute = 60 - minute;
+    }
+
+    return this.prefixes[usedPrefix]
+-       .concat(this.minuteWords(minute))
+-       .concat([direction, this.numberWords(hour)]);
++       .concat([this.numberWords(hour), direction])
++       .concat(this.minuteWords(minute));
+        </code></pre>
+</div>
+</div>
+<!-- 2f9b5194aee4db5ce01b6b6452fba8cef7e5e4a2
+    Failing test for the 'before one' case
+    -->
+<div class="slide" data-sha="2f9b5194aee4db5ce01b6b6452fba8cef7e5e4a2">
+
+<div class="slidecontent">
+<h2>And before the hour?</h2>
+<pre><code class="lang-js">
+test('12:45 es la una menos quarto', () =&gt; {
+    const time = '12:45';
+    const expected = [
+        "es", "la", "una", "menos", "cuarto"
+    ];
+
+     expect(testClock.timeWords(time)).toStrictEqual(expected);
+ });
+        </code></pre>
+<p class="step fail">FAIL</p>
+</div>
+</div>
+<!-- a0d9d5f4a4d54e1a756de25842c7cd2b326baaba
+    Correct quarter to cuarto, check plural after adjusting hours
+    -->
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2></h2>
+<pre><code class="lang-js">
+let direction = "y";
+if (minute &gt; 30) {
+    direction = "menos";
+    ++hour;
+    minute = 60 - minute;
+}
+
+        </code></pre>
+</div>
+</div>
+<!-- f8c32c9d4430ae566b6fa4258f7bf61df047b707cccccclultntjiufktvdevindrvnbrrugrthlldeejur
+
+    Refactor: Spanish never has a suffix, English never needs plural vs singular
+    -->
+<!-- cb2147295c42ba7b1da7e8af996980ae196c1031
+    Failing tests - half past, twenty five past, in spanish
+    -->
+<div class="slide" data-sha="cb2147295c42ba7b1da7e8af996980ae196c1031">
+
+<div class="slidecontent">
+<h2>etc...</h2>
+<pre><code class="lang-js">
+test('half past the hour', () =&gt; {
+    const time = '12:30';
+    const expected = [
+        "son", "las", "doce", "y", "media"
+    ];
+
+    expect(testClock.timeWords(time)).toStrictEqual(expected);
+});
+
+test('twenty-five past the hour', () =&gt; {
+    const time = '12:25';
+    const expected = [
+        "son", "las", "doce", "y", "veinticinco"
+    ];
+
+    expect(testClock.timeWords(time)).toStrictEqual(expected);
+});
+        </code></pre>
+<p class="step fail">FAIL x 2</p>
+</div>
+</div>
+<!-- 37bf73cf83206366e423fb289863fa01bb827a43
+    Correct 25 and 30 past
+    -->
+<div class="slide" data-sha="37bf73cf83206366e423fb289863fa01bb827a43">
+
+<div class="slidecontent">
+<h2>A quick fix and we're all set</h2>
+<pre><code class="lang-diff">
+     numberWords(num) {
+         if (num === 20) {
+-            return "twenty";
++            return "veinte";
+         }
+         else if (num === 15) {
+-            return "quarter";
++            return "cuarto";
++        }
++        else if (num === 25) {
++            return "veinticinco";
++        }
++        else if (num === 30) {
++            return "media";
+         }
+
+         return this.numberText[num];
+     }
+
+     minuteWords(minutes) {
++       return [this.numberWords(minutes)];
+     }
+        </code></pre>
+</div>
+</div>
+<!-- a1762076a48efbec64f6981601c53c69d770427c
+    Toggle between english/spanish in demo
+    -->
+<!-- bf4cd6195f1441b3ee343c2f20027308796118c8
+    Make eslint happy
+    -->
+<!-- 2e6b43d797d13cb5430acdbb2602edecd6320cea
+    Add failing tests for 'before 12' cases
+    -->
+<!-- 94ca1cf5bfb1b4930d215e79852384509e7bb7fb
+    Fix english/spanish 'before 12' cases
+    -->
+<div class="slide" data-sha="94ca1cf5bfb1b4930d215e79852384509e7bb7fb">
+
+<div class="slidecontent">
+<h2>Like so</h2>
+<iframe src="tddmash/demo.html"></iframe>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>Deeper Dives</h2>
+<ul>
+<li><a href="https://amzn.to/39Zsu6k">Test Driven Development: By Example</a> by Kent Beck</li>
+<li><a href="https://amzn.to/2t920yD">Growing Object-Oriented Software, Guided by Tests</a> by Steve Freeman and Nat Pryce</li>
+<li><a href="https://amzn.to/39WrPT5">The Art of Unit Testing</a> by Roy Osherove</li>
+<li><a href="https://amzn.to/2R7hEST">Working Effectively With Legacy Code</a></li>
+</ul>
+</div>
+</div>
+<div class="slide" data-sha="">
+
+<div class="slidecontent">
+<h2>Slides, Code and Further Discussion</h2>
+<ul class="contact">
+<p class="sponsor">Huge thanks to ONETUG<br/>and all our sponsors.</p>
+<li><a href="https://indieweb.social/@paulroub">@paulroub@indieweb.social 
+                </a></li>
+<li><a href="mailto:paul@roub.net">paul@roub.net
+            </a></li>
+<li><a href="https://roub.net/occ23/">roub.net/occ23
+            </a></li>
+</ul>
+<img alt="https://roub.net/occ23/" class="qr" src="images/occ23.svg"/>
+</div>
+</div>
+<script src="scripts/slides.js"></script>
+</body>
+</html>
+
